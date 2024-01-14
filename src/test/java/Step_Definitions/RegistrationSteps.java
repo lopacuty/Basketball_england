@@ -16,8 +16,10 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.edge.EdgeDriver;
 
 import java.time.Duration;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class RegistrationSteps {
 
@@ -67,15 +69,19 @@ public class RegistrationSteps {
 
         email_address.sendKeys(email);
         confirm_emailaddress.sendKeys(confirm_email);
+
+        assertEquals(email,confirm_email);
         Thread.sleep(2000);
     }
-    @Then("user  enter password {string} and {string}")
+    @Then("user enter password {string} and {string}")
     public void user_enter_password_and(String password, String con_password) throws InterruptedException {
         WebElement pass = driver.findElement(By.id("signupunlicenced_password"));
         WebElement con_pass = driver.findElement(By.id("signupunlicenced_confirmpassword"));
 
         pass.sendKeys(password);
         con_pass.sendKeys(con_password);
+
+        assertEquals(password,con_password);
         Thread.sleep(2000);
     }
 
@@ -86,7 +92,7 @@ public class RegistrationSteps {
         Thread.sleep(2000);
     }
 
-    @And("user click on the Account Conformation checkbox")
+    @And("user click on the Account conformation checkbox")
     public void user_click_on_the_account_conformation_checkbox() throws InterruptedException {
 
         driver.findElement(By.xpath("//*[@id=\"signup_form\"]/div[11]/div/div[2]/div[1]/label/span[3]")).click();
@@ -94,14 +100,14 @@ public class RegistrationSteps {
         Thread.sleep(2000);
     }
 
-    @And("user click on COMMUNICATION PREFERENCES checkbox")
+    @And("user click on Communication preferences checkbox")
     public void user_click_on_communication_preferences_checkbox() throws InterruptedException {
         driver.findElement(By.xpath("//*[@id=\"signup_form\"]/div[11]/div/div[4]/label/span[3]")).click();
         driver.findElement(By.xpath("//*[@id=\"signup_form\"]/div[11]/div/div[5]/label/span[3]")).click();
         Thread.sleep(2000);
     }
 
-    @And("user click on ETHICS AND CONDUCT checkbox")
+    @And("user click on Ethics and Conduct checkbox")
     public void user_click_on_ethics_and_conduct_checkbox() throws InterruptedException {
         driver.findElement(By.xpath("//*[@id=\"signup_form\"]/div[11]/div/div[7]/label/span[3]")).click();
         Thread.sleep(2000);
@@ -110,31 +116,19 @@ public class RegistrationSteps {
     @Then("user click on Confirm and join button")
     public void user_click_on_confirm_and_join_button() throws InterruptedException {
         By confirmButtonLocator = By.name("join");
-        WebElement confirmButton = waitForElementVisible(confirmButtonLocator, 5);
+        WebElement confirmButton = waitForElementClickable(confirmButtonLocator, 3);
         confirmButton.click();
-
-        By errorMessageLocator = By.xpath("//*[@id='signup_form']/div[6]/div[1]/div/span/span");
-        WebElement errorMessageElement = waitForElementVisible(errorMessageLocator, 5);
-
-        String errorMessage = errorMessageElement.getText();
-
-        if (!errorMessage.isEmpty()) {
-            assertEquals("Email Address is required", errorMessage);
-        }else{
-            driver.navigate().to("https://membership.basketballengland.co.uk/NewSupporterAccount");
-        }
     }
 
-    private WebElement waitForElementVisible(By locator, int timeoutInSeconds) {
+    private WebElement waitForElementClickable(By locator, int timeoutInSeconds) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
 
         try {
-            return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+            return wait.until(ExpectedConditions.elementToBeClickable(locator));
         } catch (NoSuchElementException e) {
-            throw new NoSuchElementException("Element not found: " + locator.toString());
+            throw new NoSuchElementException("Element not found or not clickable: " + locator.toString());
         }
     }
-
     @After
     public void closeDriver() {
         driver.close();
